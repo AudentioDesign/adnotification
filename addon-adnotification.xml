@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<addon addon_id="adnotification" title="[AD] Notifications" version_string="1.0.0" version_id="1000070" url="https://www.audentio.com" install_callback_class="Audentio_Notification_Listener_Install" install_callback_method="install" uninstall_callback_class="Audentio_Notification_Listener_Uninstall" uninstall_callback_method="uninstall">
+  <admin_navigation>
+    <navigation navigation_id="adnotification" parent_navigation_id="setup" display_order="35" link="adnotifications" admin_permission_id="viewAdminNotifications" debug_only="0" hide_no_children="0"/>
+    <navigation navigation_id="adnotification_view" parent_navigation_id="adnotification" display_order="5" link="adnotifications" admin_permission_id="viewAdminNotifications" debug_only="0" hide_no_children="0"/>
+    <navigation navigation_id="adnotifications_all" parent_navigation_id="adnotification" display_order="10" link="adnotifications/all" admin_permission_id="viewAdminNotifications" debug_only="0" hide_no_children="0"/>
+  </admin_navigation>
+  <admin_permissions>
+    <admin_permission admin_permission_id="deleteAdminNotifications" display_order="10002"/>
+    <admin_permission admin_permission_id="dismissAdminNotifications" display_order="10001"/>
+    <admin_permission admin_permission_id="viewAdminNotifications" display_order="10000"/>
+  </admin_permissions>
+  <admin_style_properties/>
+  <admin_templates>
+    <template title="adnotification_admin_notification_list"><![CDATA[<xen:title>{xen:phrase adnotification_admin_notifications}</xen:title>
+
+<xen:require css="filter_list.css" />
+<xen:require js="js/xenforo/filter_list.js" />
+<xen:require css="adnotification_admin_notification_list.css" />
+
+<xen:form action="{xen:adminlink adnotifications}" class="section AutoValidator">
+
+	<xen:if is="{$notifications}">
+		<h2 class="subHeading">
+			<xen:include template="filter_list_controls" />
+			{xen:phrase installed_add_ons}
+		</h2>
+
+		<ol class="FilterList">
+			<xen:foreach loop="$notifications" value="$notification">
+				<xen:listitem id="{$notification.notification_id}"
+					label="{xen:raw $notification.template_html}"
+					delete="{xen:if $canDelete, '{xen:adminlink adnotifications/delete, $notification}'}">
+					<xen:html>
+					<xen:if is="{$canDismiss}">
+					<a href="{xen:adminlink adnotifications/dismiss, $notification}" class="secondaryContent OverlayTrigger">{xen:phrase adnotification_dismiss_notification}</a>
+					</xen:if>
+					</xen:html>
+				</xen:listitem>
+			</xen:foreach>
+		</ol>
+
+		<p class="sectionFooter">{xen:phrase showing_x_of_y_items, 'count=<span class="FilterListCount">{xen:count $notifications}</span>', 'total={xen:count $notifications}'}</p>
+
+	<xen:else />
+		<div class="noResults">{xen:phrase adnotification_there_are_no_notifications_to_display}</div>
+	</xen:if>
+
+</xen:form>]]></template>
+    <template title="adnotification_admin_notification_list.css"><![CDATA[.xenForm .FilterList h4 a {
+	display: inline;
+	padding: 0;
+}
+.listItem h4 {
+	height: 30px;
+	overflow: hidden;
+	line-height: 30px;
+	padding-left: 5px;
+}]]></template>
+    <template title="adnotification_home_notificationMessage"><![CDATA[<xen:if is="{$adnotification_numAdminNotifications}">
+	<p class="importantMessage">
+		<xen:if is="{$adnotification_numAdminNotifications} > 1">
+		<a href="{xen:adminlink adnotifications}">{xen:phrase adnotification_there_are_x_admin_notifications_that_require_your_attention, 'count={xen:number $adnotification_numAdminNotifications}'}</a>
+		<xen:else />
+		<a href="{xen:adminlink adnotifications}">{xen:phrase adnotification_there_is_an_admin_notification_that_requires_your_attention}</a>
+		</xen:if>
+	</p>
+</xen:if>]]></template>
+  </admin_templates>
+  <admin_template_modifications>
+    <modification template="home" modification_key="adnotification_home_notificationMessage" description="" execution_order="10" enabled="1" action="preg_replace">
+      <find><![CDATA[/<xen:if is="{\$serverErrorLogs}">(.*?)<\/xen:if>/s]]></find>
+      <replace><![CDATA[$0
+<xen:include template="adnotification_home_notificationMessage" />]]></replace>
+    </modification>
+  </admin_template_modifications>
+  <code_events/>
+  <code_event_listeners>
+    <listener event_id="load_class_controller" execute_order="10" callback_class="Audentio_Notification_Listener_CodeEvent" callback_method="loadClass" active="1" hint="XenForo_ControllerAdmin_Home" description="Extend: XenForo_ControllerAdmin_Home"/>
+    <listener event_id="load_class_model" execute_order="20" callback_class="Audentio_Notification_Listener_CodeEvent" callback_method="loadClass" active="1" hint="XenForo_Model_ContentType" description="Extend: XenForo_Model_ContentType"/>
+  </code_event_listeners>
+  <cron/>
+  <email_templates/>
+  <email_template_modifications/>
+  <optiongroups/>
+  <permissions>
+    <permission_groups/>
+    <permissions/>
+    <interface_groups/>
+  </permissions>
+  <phrases>
+    <phrase title="admin_navigation_adnotification" version_id="1000001" version_string="1.0.0 Dev Build 1"><![CDATA[Notifications]]></phrase>
+    <phrase title="admin_navigation_adnotifications_all" version_id="1000001" version_string="1.0.0 Dev Build 1"><![CDATA[All Notifications]]></phrase>
+    <phrase title="admin_navigation_adnotification_view" version_id="1000001" version_string="1.0.0 Dev Build 1"><![CDATA[Active Notifications]]></phrase>
+    <phrase title="admin_permission_deleteAdminNotifications" version_id="1000001" version_string="1.0.0 Dev Build 1"><![CDATA[[AD] Notifications: Can Permanently Delete Admin Notifications (for everyone)]]></phrase>
+    <phrase title="admin_permission_dismissAdminNotifications" version_id="1000001" version_string="1.0.0 Dev Build 1"><![CDATA[[AD] Notifications: Can Dismiss Admin Notifications (for self)]]></phrase>
+    <phrase title="admin_permission_viewAdminNotifications" version_id="1000001" version_string="1.0.0 Dev Build 1"><![CDATA[[AD] Notifications: Can View Admin Notifications]]></phrase>
+    <phrase title="adnotification_admin_notifications" version_id="1000001" version_string="1.0.0 Dev Build 1"><![CDATA[Admin Notifications]]></phrase>
+    <phrase title="adnotification_dismiss_notification" version_id="1000001" version_string="1.0.0 Dev Build 1"><![CDATA[Dismiss Notification]]></phrase>
+    <phrase title="adnotification_there_are_no_notifications_to_display" version_id="1000001" version_string="1.0.0 Dev Build 1"><![CDATA[There are no notifications to display.]]></phrase>
+    <phrase title="adnotification_there_are_x_admin_notifications_that_require_your_attention" version_id="1000001" version_string="1.0.0 Dev Build 1"><![CDATA[There are {count} admin notifications that require your attention.]]></phrase>
+    <phrase title="adnotification_there_is_an_admin_notification_that_requires_your_attention" version_id="1000001" version_string="1.0.0 Dev Build 1"><![CDATA[There is an admin notification that requires your attention.]]></phrase>
+    <phrase title="adnotification_you_have_selected_an_invalid_notification" version_id="1000001" version_string="1.0.0 Dev Build 1"><![CDATA[You have selected an invalid notification.]]></phrase>
+  </phrases>
+  <route_prefixes>
+    <route_type type="admin">
+      <prefix original_prefix="adnotifications" class="Audentio_Notification_Route_PrefixAdmin_AdminNotification" build_link="data_only"/>
+    </route_type>
+  </route_prefixes>
+  <style_properties/>
+  <templates/>
+  <public_template_modifications/>
+  <bb_code_media_sites/>
+  <bb_codes/>
+</addon>
